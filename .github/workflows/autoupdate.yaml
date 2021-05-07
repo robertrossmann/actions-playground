@@ -1,0 +1,52 @@
+---
+name: autoupdate
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-20.04
+    name: Auto-update
+
+    steps:
+      - id: branch
+        name: Generate feature branch name
+        run: echo "::set-output ref=branch::chore/autoupdate-$(date +%h-%d)"
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Create feature branch
+        run: git switch -c ${{ steps.branch.outputs.ref }}
+
+      - name: Update something
+        run: echo "hello world" >> testfile.txt
+
+      - name: Commit changes
+        uses: swinton/commit@v2.x
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            testfile.txt
+          commit-message: 'chore: auto-update testfile.txt'
+          ref: refs/heads/${{ steps.branch.outputs.ref }}
+
+      - name: Push the feature branch
+        run: git push -u origin HEAD
+
+      - name: Create pull request
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: '${{ steps.branch.outputs.ref }}'
+          destination_branch: 'master'
+          pr_title: 'chore: auto-update testfile'
+          pr_reviewer: 'robertrossmann'
+          pr_label: 'autoupdate'
+          pr_allow_empty: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
