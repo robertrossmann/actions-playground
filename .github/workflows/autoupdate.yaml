@@ -15,7 +15,7 @@ jobs:
     steps:
       - id: branch
         name: Generate feature branch name
-        run: echo "::set-output ref=branch::chore/autoupdate-$(date +%h-%d)"
+        run: echo "::set-output name=ref::chore/autoupdate-$(date +%h-%d)"
 
       - uses: actions/checkout@v2
         with:
