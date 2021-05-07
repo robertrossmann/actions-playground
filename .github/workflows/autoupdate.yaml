@@ -33,7 +33,7 @@ jobs:
           # Optional, but recommended
           # Defaults to "Apply automatic changes"
           commit_message: 'chore: auto-update'
-          push_options: -u origin HEAD
+          push_options: -u HEAD
 
           # Optional commit user and author settings
           commit_user_name: GitHub Actions
